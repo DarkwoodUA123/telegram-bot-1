@@ -145,7 +145,7 @@ async def test_notify(ctx):
     embed.add_field(name="Зрителей:", value=viewer_count, inline=True)
     embed.set_thumbnail(url="https://static-cdn.jtvnw.net/jtv_user_pictures/twitch_profile_image.png")
     embed.set_image(url=GIF_URL)
-    embed.set_footer(text="Вопросы по боту в дс -> | stupapupa___")
+    embed.set_footer(text="Вопросы по боту в дс -> | muhovich___")
 
     await channel.send("**ЭТО ТЕСТ ОПОВЕЩЕНИЕ**\n🦄 Приветики! Стрим онлайн💜 Заходи скорее!", embed=embed)
 
