@@ -1,0 +1,11 @@
+# ID канала Discord, в который бот будет отправлять уведомления (число)
+CHANNEL_ID=957975856456794112
+
+# Twitch имя пользователя, за которым следим
+TWITCH_USERNAME=Wooflyaa
+
+# Twitch API client ID
+TWITCH_CLIENT_ID=rxskxzwaoz2wg8fzgwvoojc1588u6v
+
+# Twitch API client secret
+TWITCH_CLIENT_SECRET=w9fxt3lhs5nqtb905p36fuber37nqi
