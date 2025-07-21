@@ -8,7 +8,14 @@ from discord.ext import commands
 # Загрузка переменных окружения
 load_dotenv()
 
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+def clean_token(token: str | None) -> str | None:
+    """Убирает пробелы и символы = в начале/конце, если есть"""
+    if token:
+        return token.strip().lstrip('=').strip()
+    return None
+
+# Чистим токен, если там лишние символы
+DISCORD_TOKEN = clean_token(os.getenv('DISCORD_TOKEN'))
 channel_id_str = os.getenv('CHANNEL_ID')
 TWITCH_USERNAME = os.getenv('TWITCH_USERNAME')
 TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
@@ -17,7 +24,7 @@ TWITCH_CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
 print(f"DISCORD_TOKEN: {DISCORD_TOKEN!r}")
 print(f"CHANNEL_ID (raw): {channel_id_str!r}")
 
-if DISCORD_TOKEN is None or DISCORD_TOKEN.strip() == "":
+if DISCORD_TOKEN is None or DISCORD_TOKEN == "":
     raise ValueError("Переменная окружения DISCORD_TOKEN не установлена или пуста!")
 
 if channel_id_str is None:
@@ -27,6 +34,7 @@ try:
 except ValueError:
     raise ValueError("CHANNEL_ID должен быть числом.")
 
+# --- дальше твой исходный код без изменений ---
 GIF_URL = "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjRlYWN6aXZsYnZycTdnN2M4bGI3OXd2c2NkNmltNmpvc2F2Y3F4NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/HSyR7A954pdC4w6PHa/giphy.gif"
 
 intents = discord.Intents.default()
