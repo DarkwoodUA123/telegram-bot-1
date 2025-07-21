@@ -8,13 +8,20 @@ from discord.ext import commands
 # Загружаем .env и переменные окружения
 load_dotenv()
 
+# Отладочный вывод всех переменных окружения (кроме токенов)
+print("=== DEBUG: Переменные окружения ===")
+for k, v in os.environ.items():
+    if "TOKEN" not in k and "SECRET" not in k:
+        print(f"{k} = {v}")
+print("=== Конец вывода ===")
+
 def get_env_var(name, required=True):
     value = os.getenv(name)
     if value is None or value.strip() == "":
         if required:
             raise ValueError(f"❌ Переменная окружения {name} не установлена или пуста")
         return None
-    return value.strip()
+    return value.strip(" =")  # убираем пробелы и лишние '='
 
 try:
     DISCORD_TOKEN = get_env_var('DISCORD_TOKEN')
@@ -34,7 +41,6 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 stream_live = False  # Состояние стрима
 
-# Получение Twitch access token
 def get_twitch_access_token():
     url = "https://id.twitch.tv/oauth2/token"
     params = {
@@ -50,7 +56,6 @@ def get_twitch_access_token():
         print(f"Ошибка при получении токена Twitch: {e}")
         return None
 
-# Получение информации о стриме
 def get_stream_info():
     access_token = get_twitch_access_token()
     if not access_token:
@@ -75,7 +80,6 @@ def get_stream_info():
         print(f"Ошибка получения информации о стриме: {e}")
         return None
 
-# Цикл проверки стрима
 async def check_stream_loop():
     global stream_live
     await bot.wait_until_ready()
