@@ -5,14 +5,26 @@ import asyncio
 from dotenv import load_dotenv
 from discord.ext import commands
 
-# Загрузка переменных окружения
+# Загружаем .env и переменные окружения
 load_dotenv()
 
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-CHANNEL_ID = int(os.getenv('CHANNEL_ID'))
-TWITCH_USERNAME = os.getenv('TWITCH_USERNAME')
-TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
-TWITCH_CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
+def get_env_var(name, required=True):
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        if required:
+            raise ValueError(f"❌ Переменная окружения {name} не установлена или пуста")
+        return None
+    return value.strip()
+
+try:
+    DISCORD_TOKEN = get_env_var('DISCORD_TOKEN')
+    CHANNEL_ID = int(get_env_var('CHANNEL_ID'))
+    TWITCH_USERNAME = get_env_var('TWITCH_USERNAME')
+    TWITCH_CLIENT_ID = get_env_var('TWITCH_CLIENT_ID')
+    TWITCH_CLIENT_SECRET = get_env_var('TWITCH_CLIENT_SECRET')
+except ValueError as e:
+    print(f"[Ошибка запуска] {e}")
+    exit(1)
 
 GIF_URL = "https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif"
 
@@ -30,11 +42,12 @@ def get_twitch_access_token():
         "client_secret": TWITCH_CLIENT_SECRET,
         "grant_type": "client_credentials"
     }
-    response = requests.post(url, params=params)
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, params=params)
+        response.raise_for_status()
         return response.json().get("access_token")
-    else:
-        print("Ошибка при получении токена:", response.status_code, response.text)
+    except Exception as e:
+        print(f"Ошибка при получении токена Twitch: {e}")
         return None
 
 # Получение информации о стриме
@@ -49,23 +62,28 @@ def get_stream_info():
         "Authorization": f"Bearer {access_token}"
     }
 
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
         data = response.json().get('data')
         if data:
             stream = data[0]
             return stream['game_name'], stream['viewer_count']
         else:
             return None
-    else:
-        print("Ошибка получения информации о стриме:", response.status_code, response.text)
+    except Exception as e:
+        print(f"Ошибка получения информации о стриме: {e}")
         return None
 
-# Запуск цикла проверки стрима
+# Цикл проверки стрима
 async def check_stream_loop():
     global stream_live
     await bot.wait_until_ready()
     channel = bot.get_channel(CHANNEL_ID)
+
+    if channel is None:
+        print(f"❌ Канал с ID {CHANNEL_ID} не найден. Проверь, что бот имеет доступ.")
+        return
 
     while not bot.is_closed():
         stream_info = get_stream_info()
@@ -91,7 +109,7 @@ async def check_stream_loop():
 
 @bot.event
 async def on_ready():
-    print(f"Бот запущен как {bot.user}")
+    print(f"✅ Бот запущен как {bot.user}")
     bot.loop.create_task(check_stream_loop())
 
 bot.run(DISCORD_TOKEN)
