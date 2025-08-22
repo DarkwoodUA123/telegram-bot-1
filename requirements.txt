@@ -1,5 +1,4 @@
-discord.py
-aiohttp
-dotenv
+python-telegram-bot==22.3
+yt-dlp
 requests
 flask
