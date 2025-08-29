@@ -6,7 +6,6 @@ import os
 
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = "6125133441:AAH1DmGzp-MyNUlR2S_48ce4jveDFCC6mqc"
 DOWNLOAD_DIR = "downloads"
 
 if not os.path.exists(DOWNLOAD_DIR):
